@@ -1,15 +1,16 @@
 const shortid = require('shortid')
 const config = require('config')
 const UrlModel = require('../Model/UrlModel')
+const validator = require('../validator/validator')
 
 let createShortUrl = async (req,res) => {
     try{
     const {longUrl} = req.body
     const baseUrl = config.get('baseUrl')
-    if (!Object.keys(req.body).includes('longUrl')) {
+    if (!validator.longUrlPresent('longUrl')) {
         return res.status(400).send({ status: false, msg: "Please enter long Url" })
     }   
-    if (!(/(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})/gi.test(longUrl))) {
+    if (!validator.isValidUrl(longUrl)) {
         return res.status(400).send({ status: false, msg: ` 'Please give a valid longUrl' ` })
     }
     let url = await UrlModel.findOne({longUrl})
@@ -44,7 +45,7 @@ let redirectUrl = async (req,res) => {
             return res.status(404).send({status :false, msg : "no url found"})
         }
     }catch(err){
-        return res.status(404).send({status :false, msg : err.message})
+        return res.status(500).send({status :false, msg : err.message})
     }
 }
 module.exports = {
