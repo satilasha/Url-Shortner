@@ -14,15 +14,10 @@ let createShortUrl = async (req, res) => {
         if (!validator.isValidUrl(longUrl)) {
             return res.status(400).send({ status: false, msg: ` 'Please give a valid longUrl' ` })
         }
-        const urlCode = shortid.generate().toLowerCase()
-        const shortUrl = baseUrl + '/' + urlCode
-        let url = {
-            longUrl,
-            shortUrl,
-            urlCode
-        }
-        let uniqueUrl = await UrlModel.findOne({ urlCode })
-        while (uniqueUrl) {
+        let url = await UrlModel.findOne({ longUrl })
+        if (url) {
+            return res.status(200).send({ status: true, data: url })
+        } else {
             const urlCode = shortid.generate().toLowerCase()
             const shortUrl = baseUrl + '/' + urlCode
             url = {
@@ -30,11 +25,12 @@ let createShortUrl = async (req, res) => {
                 shortUrl,
                 urlCode
             }
+
+            let newUrl = await UrlModel.create(url)
+            return res.status(200).send({ status: true, data: newUrl })
+
         }
-
-        let newUrl = await UrlModel.create(url)
-        return res.status(200).send({ status: true, data: newUrl })
-
+       
     } catch (err) {
         return res.status(400).send({ status: false, msg: err.message })
     }
