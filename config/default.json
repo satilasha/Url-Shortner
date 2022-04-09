@@ -1,3 +1,4 @@
+
 {
     "mongoURI": "mongodb+srv://projects:HUZoMyW5YHmzZ9Fp@cluster0.xdlqm.mongodb.net/group41Database?retryWrites=true&w=majority",
     "baseUrl": "http://localhost:3000"
